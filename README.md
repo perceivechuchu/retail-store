@@ -1,2 +1,2 @@
 # retail-store
-Restful Service using SpringBoot
+Restful Service in Java 8 and SpringBoot
