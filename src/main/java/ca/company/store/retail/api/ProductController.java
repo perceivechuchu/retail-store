@@ -39,7 +39,7 @@ public class ProductController {
 
 	@GetMapping
 	public ApiResponse<List<ProductInfo>> listProducts(){
-		log.info("in listProducts");
+		log.info("listProducts");
 		List<Product> products = productService.listProducts();
 		if(products.isEmpty()) {
 			return new ApiResponse<>(new ArrayList<>(), HttpStatus.NOT_FOUND.toString(), "No products found");
@@ -52,6 +52,7 @@ public class ProductController {
 	
 	@PostMapping
 	public ApiResponse<ProductInfo> createProduct(@RequestBody ProductInfo productInfo){
+		log.info("createProduct request:" + productInfo);
 		final Product productToCreate = ProductBuilder.createProduct()
 				.withName(productInfo.getName())
 				.withBarCode(productInfo.getBarCode())
@@ -66,18 +67,21 @@ public class ProductController {
 	
 	@PutMapping("/{id}")
 	public ApiResponse<ProductInfo> updateProduct(@PathVariable final Long id, @RequestBody ProductInfo productInfo){
+		log.info("updateProduct request:" + productInfo);
 		Product updatedProduct = productService.updateProduct(id, productInfo);	
 		return new ApiResponse<>(new ProductInfo(updatedProduct), HttpStatus.OK.toString(), "Product created successfully");
 	}
 	
 	@GetMapping("/{id}")
 	public ApiResponse<ProductInfo> findProduct(@PathVariable final Long id){
+		log.info("findProduct id:" + id);
 		final Product product = productService.findProduct(id);
 		return new ApiResponse<>(new ProductInfo(product), HttpStatus.OK.toString(), "Product retrieved successfully");
 	}
 		
 	@DeleteMapping("/{id}")
 	public ApiResponse<ProductInfo> deleteProduct(@PathVariable final Long id){
+		log.info("deleteProduct id:" + id);
 		final Product product = productService.deleteProduct(id);
 		return new ApiResponse<>(new ProductInfo(product), HttpStatus.OK.toString(), "Product has been deleted successfully");
 	}
