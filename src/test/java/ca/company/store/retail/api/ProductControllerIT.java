@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -28,21 +29,21 @@ import ca.company.store.retail.model.Product;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-public class ProductControllerTests {
+public class ProductControllerIT {
 	
-	@Autowired
+    @Autowired
 	private TestRestTemplate testRestTemplate;
 	
 	private SoftAssertions softAssertions;
 	
 	Product product;
 	
-	private String baseUrl = "http://localhost:8099/store/retail/api/v1";
+	private String baseUrl = "http://localhost:9000/store/retail/api/v1";
 	
 	@Before
 	public void setup() {
 		softAssertions = new SoftAssertions();
-		
+
 		product = new Product();
 		product.setId(100L);
 		product.setName("Cooking Oil");;
@@ -89,7 +90,8 @@ public class ProductControllerTests {
 	
 	@Test
 	public void findProductShouldReturnProductWithSuccess() throws Exception {
-		ResponseEntity<ApiResponse<ProductInfo>> response = testRestTemplate.exchange(baseUrl + "/products/1",
+		ResponseEntity<ApiResponse<ProductInfo>> response = testRestTemplate.exchange(
+				baseUrl + "/products/1",
 				HttpMethod.GET, HttpEntity.EMPTY, 
 				new ParameterizedTypeReference<ApiResponse<ProductInfo>>() {
 				});
@@ -100,5 +102,4 @@ public class ProductControllerTests {
 		softAssertions.assertThat(apiResponse.getResponseBody().getId()).isEqualTo(1L);
 		softAssertions.assertAll();
 	}
-
 }
