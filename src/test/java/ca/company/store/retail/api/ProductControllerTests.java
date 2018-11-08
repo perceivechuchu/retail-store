@@ -28,8 +28,11 @@ import ca.company.store.retail.model.Product;
 */
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-public class ProductControllerIT {
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+public class ProductControllerTests {
+	
+	@LocalServerPort
+	private int port;
 	
     @Autowired
 	private TestRestTemplate testRestTemplate;
@@ -38,7 +41,9 @@ public class ProductControllerIT {
 	
 	Product product;
 	
-	private String baseUrl = "http://localhost:9000/store/retail/api/v1";
+	private String urlRoot = "http://localhost:";
+	
+	private String baseUrlEndpoint = "/store/retail/api/v1/products";
 	
 	@Before
 	public void setup() {
@@ -46,8 +51,8 @@ public class ProductControllerIT {
 
 		product = new Product();
 		product.setId(100L);
-		product.setName("Cooking Oil");;
-		product.setBarCode("263553426");;
+		product.setName("Cooking Oil");
+		product.setBarCode("263553426");
 		product.setCategory("GROCERY");
 		product.setPrice(95.34);
 		product.setDateCreated(LocalDateTime.now());
@@ -56,7 +61,7 @@ public class ProductControllerIT {
 	@Test
 	public void listProductsShouldReturnOkWithListOfProducts() {
 		ResponseEntity<ApiResponse<List<ProductInfo>>> response = testRestTemplate.exchange(
-				baseUrl + "/products",
+				createURLWithPort(baseUrlEndpoint),
 				HttpMethod.GET, HttpEntity.EMPTY, 
 				new ParameterizedTypeReference<ApiResponse<List<ProductInfo>>>() {
 				});
@@ -74,7 +79,7 @@ public class ProductControllerIT {
 		HttpEntity<ProductInfo> request = new HttpEntity<>(toCreate);
 
 		ResponseEntity<ApiResponse<ProductInfo>> httpResponse = testRestTemplate.exchange(
-				baseUrl + "/products", HttpMethod.POST, request,
+				createURLWithPort(baseUrlEndpoint), HttpMethod.POST, request,
 				new ParameterizedTypeReference<ApiResponse<ProductInfo>>() {
 				});
 		ApiResponse<ProductInfo> apiResponse = httpResponse.getBody();
@@ -91,7 +96,7 @@ public class ProductControllerIT {
 	@Test
 	public void findProductShouldReturnProductWithSuccess() throws Exception {
 		ResponseEntity<ApiResponse<ProductInfo>> response = testRestTemplate.exchange(
-				baseUrl + "/products/1",
+				createURLWithPort(baseUrlEndpoint + "/1"),
 				HttpMethod.GET, HttpEntity.EMPTY, 
 				new ParameterizedTypeReference<ApiResponse<ProductInfo>>() {
 				});
@@ -101,5 +106,9 @@ public class ProductControllerIT {
 		softAssertions.assertThat(apiResponse.getResponseBody()).isNotNull();
 		softAssertions.assertThat(apiResponse.getResponseBody().getId()).isEqualTo(1L);
 		softAssertions.assertAll();
+	}
+	
+	private String createURLWithPort(String uri) {
+		return urlRoot + port + uri;
 	}
 }
